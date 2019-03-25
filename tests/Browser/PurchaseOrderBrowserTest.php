@@ -4,6 +4,7 @@ namespace Tests\Browser;
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
+use Tests\Browser\Pages\PurchaseOrderIndexPage;
 use Tests\DuskTestCase;
 
 class PurchaseOrderBrowserTest extends DuskTestCase
@@ -11,7 +12,7 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     use DatabaseMigrations;
 
     /** @test */
-    public function it_can_accept_valid_purchase_orders()
+    public function it_can_accept_valid_purchase_orders_and_display_results()
     {
         $this->browse(function (Browser $browser) {
             $browser
@@ -34,8 +35,16 @@ class PurchaseOrderBrowserTest extends DuskTestCase
                 $browser->type($field, $value);
             }
 
-            $browser->press('Submit');
-            $this->assertDatabaseHas('purchase_orders', $po);
+            $browser
+                ->press('Submit')
+                ->on(new PurchaseOrderIndexPage())
+                ->with('.table', function($table) use ($po) {
+                    $table
+                        ->assertSee($po['buyer'])
+                        ->assertSee('View')
+                        ->assertSee('Edit')
+                        ->assertSee('Delete');
+                });
         });
-    }    
+    }      
 }

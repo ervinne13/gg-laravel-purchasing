@@ -14,7 +14,8 @@ class PurchaseOrderController extends Controller
      */
     public function index()
     {
-        //
+        $poList = PurchaseOrder::all();
+        return view('po.index', ['poList' => $poList]);
     }
 
     /**
