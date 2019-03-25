@@ -9,9 +9,12 @@ RUN rm /etc/nginx/sites-enabled/vhost
 ADD ./vhost-purchasing.conf /etc/nginx/sites-available
 RUN ln -s /etc/nginx/sites-available/vhost-purchasing.conf /etc/nginx/sites-enabled/vhost-purchasing
 
-# Expose React hot reloading candidate ports
+# HTTP(S) ports
 EXPOSE 80
 EXPOSE 443
+
+# Browser Testing Port
+EXPOSE 9515
 
 RUN echo > /etc/resolv.conf
 RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
