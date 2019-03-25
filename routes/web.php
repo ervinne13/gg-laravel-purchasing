@@ -12,5 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('po.form');
+    return view('welcome');
 });
+
+Route::resource('/po', 'PurchaseOrderController');
