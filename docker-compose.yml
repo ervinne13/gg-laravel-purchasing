@@ -1,0 +1,21 @@
+version: "3.2"
+
+services:
+  app:
+    image: gg/purchasing:7.2
+    build:
+      context: ./docker-config
+    container_name: purchasing-13.5
+    user: root
+    volumes:
+      # host:container
+      - ${LOCAL_PATH}:/var/www/vhost/gg-purchasing
+    networks:
+       default:
+          ipv4_address: 192.168.13.5
+    tty: true
+    stdin_open: true
+networks:
+  default:
+    external:
+      name: docker-bridge-local
