@@ -2,10 +2,11 @@
 
 namespace Tests\Browser;
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Laravel\Dusk\Browser;
-use Tests\Browser\Pages\PurchaseOrderIndexPage;
 use Tests\DuskTestCase;
+use Laravel\Dusk\Browser;
+use App\Models\PurchaseOrder;
+use Tests\Browser\Pages\PurchaseOrderIndexPage;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class PurchaseOrderBrowserTest extends DuskTestCase
 {
@@ -46,5 +47,23 @@ class PurchaseOrderBrowserTest extends DuskTestCase
                         ->assertSee('Delete');
                 });
         });
-    }      
+    }
+
+    /** @test */
+    public function it_can_view_created_purchase_orders()
+    {
+        $poList = factory(PurchaseOrder::class, 10)->create();
+        
+        $this->browse(function (Browser $browser) use ($poList) {
+            foreach($poList as $po) {
+                $browser
+                    ->visit("/po/{$po->id}")
+                    ->assertSee($po->buyer)
+                    ->assertSee($po->supplier)
+                    ->assertSee($po->total_cost)
+                    ->assertSee($po->breakdown)
+                    ->assertSee($po->purpose);
+            }
+        });        
+    }
 }
