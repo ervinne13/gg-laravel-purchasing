@@ -10,44 +10,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class PurchaseOrderBrowserTest extends DuskTestCase
 {
-    use DatabaseMigrations;
-
-    /** @test */
-    public function it_can_accept_valid_purchase_orders_and_display_results()
-    {
-        $this->browse(function (Browser $browser) {
-            $browser
-                ->visit('/po/create')
-                ->assertSee('Buyer')
-                ->assertSee('Supplier')
-                ->assertSee('Total Cost')
-                ->assertSee('Breakdown')
-                ->assertSee('Purpose');
-
-            $po = [
-                'buyer'         => 'Ervinne Sodusta',
-                'supplier'      => 'Jet Lighting LTD',
-                'total_cost'    => 45000,
-                'breakdown'     => 'Tube light Industrial 4w x 20, Tube light Industrial 7w x 15',
-                'purpose'       => 'Replenishment'
-            ];
-
-            foreach($po as $field => $value) {
-                $browser->type($field, $value);
-            }
-
-            $browser
-                ->press('Submit')
-                ->on(new PurchaseOrderIndexPage())
-                ->with('.table', function($table) use ($po) {
-                    $table
-                        ->assertSee($po['buyer'])
-                        ->assertSee('View')
-                        ->assertSee('Edit')
-                        ->assertSee('Delete');
-                });
-        });
-    }
+    use DatabaseMigrations;    
 
     /** @test */
     public function it_can_view_created_purchase_orders()
@@ -84,5 +47,76 @@ class PurchaseOrderBrowserTest extends DuskTestCase
                     ->assertUrlIs(url("/po/{$po->id}"));
             }
         });
+    }
+
+    /** @test */
+    public function it_can_accept_valid_purchase_orders_and_display_results()
+    {
+        $this->browse(function (Browser $browser) {
+            $po = $this->getPurchaseOrderStub();
+
+            $browser->visit('/po/create');
+            $this->assertFormViewContainsCorrectLabelsWith($browser);
+            $this->typeInPurchaseOrderToFieldsTo($browser, $po);
+            $this->assertSavedPurchaseOrderDisplaysResultsOnSubmitWith($browser, $po);
+        });
+    }
+
+    /** @test */
+    public function it_can_update_purchase_orders_with_valid_input_and_display_results()
+    {
+        $createdPoList = factory(PurchaseOrder::class, 1)->create();
+        $po = $createdPoList[0];
+
+        $this->browse(function (Browser $browser) use ($po) {
+            $updatedPo = $this->getPurchaseOrderStub();
+
+            $browser->visit("/po/{$po->id}/edit");
+            $this->assertFormViewContainsCorrectLabelsWith($browser);
+            $this->typeInPurchaseOrderToFieldsTo($browser, $updatedPo);
+            $this->assertSavedPurchaseOrderDisplaysResultsOnSubmitWith($browser, $updatedPo);
+        });
+    }
+
+    private function assertFormViewContainsCorrectLabelsWith($browser) : void
+    {
+        $browser
+            ->assertSee('Buyer')
+            ->assertSee('Supplier')
+            ->assertSee('Total Cost')
+            ->assertSee('Breakdown')
+            ->assertSee('Purpose');
+    }
+
+    private function getPurchaseOrderStub() : array
+    {
+        return [
+            'buyer'         => 'Ervinne Sodusta',
+            'supplier'      => 'Jet Lighting LTD',
+            'total_cost'    => '45000.00',
+            'breakdown'     => 'Tube light Industrial 4w x 20, Tube light Industrial 7w x 15',
+            'purpose'       => 'Replenishment'
+        ];
+    }
+
+    private function typeInPurchaseOrderToFieldsTo($browser, array $po) : void
+    {
+        foreach($po as $field => $value) {
+            $browser->type($field, $value);
+        }
+    }
+
+    private function assertSavedPurchaseOrderDisplaysResultsOnSubmitWith($browser, array $po) : void
+    {
+        $browser
+            ->press('Submit')
+            ->on(new PurchaseOrderIndexPage())
+            ->with('.table', function($table) use ($po) {
+                $table
+                    ->assertSee($po['buyer'])
+                    ->assertSee('View')
+                    ->assertSee('Edit')
+                    ->assertSee('Delete');
+            });
     }
 }
