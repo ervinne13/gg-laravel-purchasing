@@ -51,7 +51,8 @@ class PurchaseOrderController extends Controller
      */
     public function show($id)
     {
-        //
+        $po = PurchaseOrder::findOrFail($id);
+        return view('po.view', ['po' => $po]);
     }
 
     /**

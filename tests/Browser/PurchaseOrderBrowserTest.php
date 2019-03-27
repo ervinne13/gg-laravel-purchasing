@@ -52,18 +52,37 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     /** @test */
     public function it_can_view_created_purchase_orders()
     {
-        $poList = factory(PurchaseOrder::class, 10)->create();
+        $poList = factory(PurchaseOrder::class, 5)->create();
         
         $this->browse(function (Browser $browser) use ($poList) {
             foreach($poList as $po) {
+                $totalCostDisplay = 'P' . number_format($po->total_cost);
+
                 $browser
                     ->visit("/po/{$po->id}")
                     ->assertSee($po->buyer)
                     ->assertSee($po->supplier)
-                    ->assertSee($po->total_cost)
+                    ->assertSee($totalCostDisplay)
                     ->assertSee($po->breakdown)
                     ->assertSee($po->purpose);
             }
-        });        
+        });
+    }
+
+    /** @test */
+    public function it_redirects_purchase_order_on_clicking_view_on_index()
+    {
+        $poList = factory(PurchaseOrder::class, 5)->create();
+
+        $this->browse(function (Browser $browser) use ($poList) {
+            foreach($poList as $po) {
+
+                $actionLinkSelector = "[action='view-po'][data-id='{$po->id}']";
+                $browser
+                    ->visit('/po')
+                    ->click($actionLinkSelector)
+                    ->assertUrlIs(url("/po/{$po->id}"));
+            }
+        });
     }
 }

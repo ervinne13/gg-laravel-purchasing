@@ -16,7 +16,11 @@
             <td>{{$po->buyer}}</td>
             <td>{{$po->supplier}}</td>
             <td>{{$po->purpose}}</td>
-            <td>View Edit Delete</td>
+            <td>
+                <a action="view-po" data-id="{{$po->id}}" href="{{route('po.show', $po->id)}}">View</a>
+                Edit 
+                Delete
+            </td>
         </tr>
         @endforeach
     </tbody>
