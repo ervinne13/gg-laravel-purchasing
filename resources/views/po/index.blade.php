@@ -18,7 +18,7 @@
             <td>{{$po->purpose}}</td>
             <td>
                 <a action="view-po" data-id="{{$po->id}}" href="{{route('po.show', $po->id)}}">View</a>
-                Edit 
+                <a action="edit-po" data-id="{{$po->id}}" href="{{route('po.edit', $po->id)}}">Edit</a>
                 Delete
             </td>
         </tr>
