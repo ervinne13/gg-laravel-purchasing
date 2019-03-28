@@ -85,9 +85,13 @@ class PurchaseOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
+        Log::info('updating');
         $po = PurchaseOrder::findOrFail($id);
         $po->fill($request->toArray());
         $po->save();
+
+        Log::info('updated');
+        Log::info($po);
 
         return redirect()->route('po.index');
     }

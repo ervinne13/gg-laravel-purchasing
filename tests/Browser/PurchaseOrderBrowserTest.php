@@ -102,7 +102,7 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     private function typeInPurchaseOrderToFieldsTo($browser, array $po) : void
     {
         foreach($po as $field => $value) {
-            $browser->type($field, $value);
+            $browser->type($field, trim($value));
         }
     }
 
