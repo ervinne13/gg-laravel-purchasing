@@ -104,6 +104,7 @@ class PurchaseOrderController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $po = PurchaseOrder::findOrFail($id);
+        $po->delete();
     }
 }

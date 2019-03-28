@@ -50,6 +50,23 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     }
 
     /** @test */
+    public function it_redirects_purchase_order_on_clicking_edit_on_index()
+    {
+        $poList = factory(PurchaseOrder::class, 5)->create();
+
+        $this->browse(function (Browser $browser) use ($poList) {
+            foreach($poList as $po) {
+
+                $actionLinkSelector = "[action='edit-po'][data-id='{$po->id}']";
+                $browser
+                    ->visit('/po')
+                    ->click($actionLinkSelector)
+                    ->assertUrlIs(url("/po/{$po->id}/edit"));
+            }
+        });
+    }
+
+    /** @test */
     public function it_can_accept_valid_purchase_orders_and_display_results()
     {
         $this->browse(function (Browser $browser) {
@@ -118,5 +135,20 @@ class PurchaseOrderBrowserTest extends DuskTestCase
                     ->assertSee('Edit')
                     ->assertSee('Delete');
             });
+    }
+
+    /** @test */
+    public function it_can_delete_purchase_orders()
+    {
+        $createdPoList = factory(PurchaseOrder::class, 1)->create();
+        $po = $createdPoList[0];
+
+        $this->browse(function (Browser $browser) use ($po) {        
+            $actionLinkSelector = "[action='delete-po'][data-id='{$po->id}']";
+                $browser
+                    ->visit('/po')
+                    ->click($actionLinkSelector)
+                    ->assertUrlIs(url("/po/{$po->id}"));
+        });
     }
 }
