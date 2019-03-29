@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
+use Illuminate\Support\Facades\Log;
 
 class PurchaseOrderController extends Controller
 {
@@ -25,7 +26,12 @@ class PurchaseOrderController extends Controller
      */
     public function create()
     {
-        return view('po.form');
+        return view('po.form', [
+            'po'        => new PurchaseOrder(),
+            'action'    => route('po.store'),
+            'method'    => 'POST',
+            'title'     => 'Create'
+        ]);
     }
 
     /**
@@ -51,7 +57,8 @@ class PurchaseOrderController extends Controller
      */
     public function show($id)
     {
-        //
+        $po = PurchaseOrder::findOrFail($id);
+        return view('po.view', ['po' => $po]);
     }
 
     /**
@@ -62,7 +69,13 @@ class PurchaseOrderController extends Controller
      */
     public function edit($id)
     {
-        //
+        $po = PurchaseOrder::findOrFail($id);
+        return view('po.form', [
+            'po'        => $po,
+            'action'    => route('po.update', $id),
+            'method'    => 'PUT',
+            'title'     => 'Edit'
+        ]);
     }
 
     /**
@@ -74,7 +87,15 @@ class PurchaseOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        Log::info('updating');
+        $po = PurchaseOrder::findOrFail($id);
+        $po->fill($request->toArray());
+        $po->save();
+
+        Log::info('updated');
+        Log::info($po);
+
+        return redirect()->route('po.index');
     }
 
     /**
@@ -85,6 +106,7 @@ class PurchaseOrderController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $po = PurchaseOrder::findOrFail($id);
+        $po->delete();
     }
 }

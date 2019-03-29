@@ -1,4 +1,34 @@
-@extends('layout.default')
+@extends('adminlte::page')
+
+@section('title', 'Purchase Orders | Listing')
+
+@section('js')
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function () {
+    initializeEvents();
+});
+
+function initializeEvents() {
+    const deleteActions = document.querySelector('[action=delete-po]')
+
+    if (deleteActions) {
+        deleteActions.addEventListener('click', function(el) {
+            const poId = this.getAttribute('data-id');
+            deletePurchaseOrderWithId(poId);
+        });
+    }
+}
+
+function deletePurchaseOrderWithId(poId) {
+    const url = `/po/${poId}`;
+    axios.delete(url)
+        .then((response) => {
+            console.log(response);
+            window.location.reload();
+        });
+}
+</script>
+@stop
 
 @section('content')
 <table class="table">
@@ -16,7 +46,11 @@
             <td>{{$po->buyer}}</td>
             <td>{{$po->supplier}}</td>
             <td>{{$po->purpose}}</td>
-            <td>View Edit Delete</td>
+            <td>
+                <a action="view-po" data-id="{{$po->id}}" href="{{route('po.show', $po->id)}}">View</a>
+                <a action="edit-po" data-id="{{$po->id}}" href="{{route('po.edit', $po->id)}}">Edit</a>
+                <a action="delete-po" data-id="{{$po->id}}" href="javascript:;">Delete</a>
+            </td>
         </tr>
         @endforeach
     </tbody>

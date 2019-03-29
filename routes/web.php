@@ -15,4 +15,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('/po', 'PurchaseOrderController');
+Route::group(['middleware' => 'auth'], function() {
+    Route::resource('/po', 'PurchaseOrderController');
+});
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
