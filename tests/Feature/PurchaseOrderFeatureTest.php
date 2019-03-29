@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\User;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PurchaseOrderFeatureTest extends TestCase
 {
@@ -19,7 +20,11 @@ class PurchaseOrderFeatureTest extends TestCase
             'breakdown'     => 'Tube light Industrial 4w x 20, Tube light Industrial 7w x 15',
             'purpose'       => 'Replenishment'
         ];
-        $response = $this->json('POST', '/po', $po);
+
+        $userList = factory(User::class, 1)->create();
+        $user = $userList[0];
+
+        $response = $this->actingAs($user)->json('POST', '/po', $po);
         $response->assertRedirect('/po');
         $this->assertDatabaseHas('purchase_orders', $po);
     }
