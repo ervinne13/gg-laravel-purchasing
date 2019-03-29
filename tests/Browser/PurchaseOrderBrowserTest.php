@@ -127,14 +127,9 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     {
         $browser
             ->press('Submit')
-            ->on(new PurchaseOrderIndexPage())
-            ->with('.table', function($table) use ($po) {
-                $table
-                    ->assertSee($po['buyer'])
-                    ->assertSee('View')
-                    ->assertSee('Edit')
-                    ->assertSee('Delete');
-            });
+            ->on(new PurchaseOrderIndexPage());
+            
+        $this->assertSeePurchaseOrderRowOn($browser, $po);
     }
 
     /** @test */
@@ -145,10 +140,37 @@ class PurchaseOrderBrowserTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($po) {        
             $actionLinkSelector = "[action='delete-po'][data-id='{$po->id}']";
-                $browser
-                    ->visit('/po')
-                    ->click($actionLinkSelector)
-                    ->assertUrlIs(url("/po/{$po->id}"));
+            $browser->visit('/po');
+            $this->assertSeePurchaseOrderRowOn($browser, $po);
+
+            $browser
+                ->click($actionLinkSelector)
+                ->waitForReload()
+                ->assertUrlIs(url("/po"));
+
+            $this->assertDontSeePurchaseOrderRowOn($browser, $po);
         });
+    }
+
+    private function assertSeePurchaseOrderRowOn($browser, $po)
+    {
+        $browser
+            ->with('.table', function($table) use ($po) {
+                $table
+                    ->assertSee($po['buyer'])
+                    ->assertSee($po['supplier'])
+                    ->assertSee($po['purpose']);
+            });
+    }
+
+    private function assertDontSeePurchaseOrderRowOn($browser, $po)
+    {
+        $browser
+            ->with('.table', function($table) use ($po) {
+                $table
+                    ->assertDontSee($po['buyer'])
+                    ->assertDontSee($po['supplier'])
+                    ->assertDontSee($po['purpose']);
+            });
     }
 }
