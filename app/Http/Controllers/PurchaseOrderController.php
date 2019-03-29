@@ -29,7 +29,8 @@ class PurchaseOrderController extends Controller
         return view('po.form', [
             'po'        => new PurchaseOrder(),
             'action'    => route('po.store'),
-            'method'    => 'POST'
+            'method'    => 'POST',
+            'title'     => 'Create'
         ]);
     }
 
@@ -72,7 +73,8 @@ class PurchaseOrderController extends Controller
         return view('po.form', [
             'po'        => $po,
             'action'    => route('po.update', $id),
-            'method'    => 'PUT'
+            'method'    => 'PUT',
+            'title'     => 'Edit'
         ]);
     }
 

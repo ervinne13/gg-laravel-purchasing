@@ -1,4 +1,6 @@
-@extends('layout.default')
+@extends('adminlte::page')
+
+@section('title', 'Purchase Orders | View')
 
 @section('content')
 

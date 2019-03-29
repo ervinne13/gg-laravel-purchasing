@@ -2,26 +2,32 @@
 
 namespace Tests\Browser;
 
+use App\User;
 use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 use App\Models\PurchaseOrder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\Browser\Pages\PurchaseOrderIndexPage;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class PurchaseOrderBrowserTest extends DuskTestCase
 {
     use DatabaseMigrations;    
-
+    
     /** @test */
     public function it_can_view_created_purchase_orders()
     {
         $poList = factory(PurchaseOrder::class, 5)->create();
-        
-        $this->browse(function (Browser $browser) use ($poList) {
+        $userList = factory(User::class, 1)->create();
+        $user = $userList[0];
+
+        $this->browse(function (Browser $browser) use ($poList, $user) {
             foreach($poList as $po) {
                 $totalCostDisplay = 'P' . number_format($po->total_cost);
 
                 $browser
+                    ->loginAs($user)
                     ->visit("/po/{$po->id}")
                     ->assertSee($po->buyer)
                     ->assertSee($po->supplier)
@@ -36,12 +42,15 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     public function it_redirects_purchase_order_on_clicking_view_on_index()
     {
         $poList = factory(PurchaseOrder::class, 5)->create();
+        $userList = factory(User::class, 1)->create();
+        $user = $userList[0];
 
-        $this->browse(function (Browser $browser) use ($poList) {
+        $this->browse(function (Browser $browser) use ($poList, $user) {
             foreach($poList as $po) {
 
                 $actionLinkSelector = "[action='view-po'][data-id='{$po->id}']";
                 $browser
+                    ->loginAs($user)
                     ->visit('/po')
                     ->click($actionLinkSelector)
                     ->assertUrlIs(url("/po/{$po->id}"));
@@ -53,12 +62,15 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     public function it_redirects_purchase_order_on_clicking_edit_on_index()
     {
         $poList = factory(PurchaseOrder::class, 5)->create();
+        $userList = factory(User::class, 1)->create();
+        $user = $userList[0];
 
-        $this->browse(function (Browser $browser) use ($poList) {
+        $this->browse(function (Browser $browser) use ($poList, $user) {
             foreach($poList as $po) {
 
                 $actionLinkSelector = "[action='edit-po'][data-id='{$po->id}']";
                 $browser
+                    ->loginAs($user)
                     ->visit('/po')
                     ->click($actionLinkSelector)
                     ->assertUrlIs(url("/po/{$po->id}/edit"));
@@ -71,8 +83,10 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $po = $this->getPurchaseOrderStub();
+            $userList = factory(User::class, 1)->create();
+            $user = $userList[0];
 
-            $browser->visit('/po/create');
+            $browser->loginAs($user)->visit('/po/create');
             $this->assertFormViewContainsCorrectLabelsWith($browser);
             $this->typeInPurchaseOrderToFieldsTo($browser, $po);
             $this->assertSavedPurchaseOrderDisplaysResultsOnSubmitWith($browser, $po);
@@ -85,10 +99,13 @@ class PurchaseOrderBrowserTest extends DuskTestCase
         $createdPoList = factory(PurchaseOrder::class, 1)->create();
         $po = $createdPoList[0];
 
-        $this->browse(function (Browser $browser) use ($po) {
+        $userList = factory(User::class, 1)->create();
+        $user = $userList[0];
+
+        $this->browse(function (Browser $browser) use ($po, $user) {
             $updatedPo = $this->getPurchaseOrderStub();
 
-            $browser->visit("/po/{$po->id}/edit");
+            $browser->loginAs($user)->visit("/po/{$po->id}/edit");
             $this->assertFormViewContainsCorrectLabelsWith($browser);
             $this->typeInPurchaseOrderToFieldsTo($browser, $updatedPo);
             $this->assertSavedPurchaseOrderDisplaysResultsOnSubmitWith($browser, $updatedPo);
@@ -138,12 +155,15 @@ class PurchaseOrderBrowserTest extends DuskTestCase
         $createdPoList = factory(PurchaseOrder::class, 1)->create();
         $po = $createdPoList[0];
 
-        $this->browse(function (Browser $browser) use ($po) {        
+        $userList = factory(User::class, 1)->create();
+        $user = $userList[0];
+
+        $this->browse(function (Browser $browser) use ($po, $user) {        
             $actionLinkSelector = "[action='delete-po'][data-id='{$po->id}']";
-            $browser->visit('/po');
+            $browser->loginAs($user)->visit('/po');
             $this->assertSeePurchaseOrderRowOn($browser, $po);
 
-            $browser
+            $browser                
                 ->click($actionLinkSelector)
                 ->waitForReload()
                 ->assertUrlIs(url("/po"));

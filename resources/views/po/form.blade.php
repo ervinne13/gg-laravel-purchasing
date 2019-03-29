@@ -1,4 +1,6 @@
-@extends('layout.default')
+@extends('adminlte::page')
+
+@section('title', "Purchase Orders | {$title}")
 
 @section('content')
 <form action="{{$action}}" method="POST">

@@ -1,6 +1,8 @@
-@extends('layout.default')
+@extends('adminlte::page')
 
-@section('content')
+@section('title', 'Purchase Orders | Listing')
+
+@section('js')
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function () {
     initializeEvents();
@@ -26,6 +28,9 @@ function deletePurchaseOrderWithId(poId) {
         });
 }
 </script>
+@stop
+
+@section('content')
 <table class="table">
     <thead>
         <tr>
