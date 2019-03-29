@@ -52,6 +52,7 @@ class PurchaseOrderBrowserTest extends DuskTestCase
                 $browser
                     ->loginAs($user)
                     ->visit('/po')
+                    ->waitUntilMissing('#dataTableBuilder_processing')
                     ->click($actionLinkSelector)
                     ->assertUrlIs(url("/po/{$po->id}"));
             }
@@ -72,6 +73,7 @@ class PurchaseOrderBrowserTest extends DuskTestCase
                 $browser
                     ->loginAs($user)
                     ->visit('/po')
+                    ->waitUntilMissing('#dataTableBuilder_processing')
                     ->click($actionLinkSelector)
                     ->assertUrlIs(url("/po/{$po->id}/edit"));
             }
@@ -160,7 +162,10 @@ class PurchaseOrderBrowserTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($po, $user) {        
             $actionLinkSelector = "[action='delete-po'][data-id='{$po->id}']";
-            $browser->loginAs($user)->visit('/po');
+            $browser
+                ->loginAs($user)
+                ->visit('/po');
+
             $this->assertSeePurchaseOrderRowOn($browser, $po);
 
             $browser                
@@ -175,8 +180,9 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     private function assertSeePurchaseOrderRowOn($browser, $po)
     {
         $browser
-            ->with('.table', function($table) use ($po) {
+            ->with('.dataTable', function($table) use ($po) {
                 $table
+                    ->waitUntilMissing('#dataTableBuilder_processing')
                     ->assertSee($po['buyer'])
                     ->assertSee($po['supplier'])
                     ->assertSee($po['purpose']);
@@ -186,8 +192,9 @@ class PurchaseOrderBrowserTest extends DuskTestCase
     private function assertDontSeePurchaseOrderRowOn($browser, $po)
     {
         $browser
-            ->with('.table', function($table) use ($po) {
+            ->with('.dataTable', function($table) use ($po) {
                 $table
+                    ->waitUntilMissing('#dataTableBuilder_processing')
                     ->assertDontSee($po['buyer'])
                     ->assertDontSee($po['supplier'])
                     ->assertDontSee($po['purpose']);

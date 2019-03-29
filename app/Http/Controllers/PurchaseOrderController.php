@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
 use Illuminate\Support\Facades\Log;
+use App\DataTables\PurchaseOrderDataTable;
+use App\Http\Requests\SavePurchaseOrderRequest;
 
 class PurchaseOrderController extends Controller
 {
@@ -13,10 +15,9 @@ class PurchaseOrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(PurchaseOrderDataTable $dataTable)
     {
-        $poList = PurchaseOrder::all();
-        return view('po.index', ['poList' => $poList]);
+        return $dataTable->render('po.index');
     }
 
     /**
@@ -40,7 +41,7 @@ class PurchaseOrderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(SavePurchaseOrderRequest $request)
     {
         $po = new PurchaseOrder();
         $po->fill($request->toArray());
