@@ -38,5 +38,12 @@ function deletePurchaseOrderWithId(poId) {
 @stop
 
 @section('content')
-{!! $dataTable->table() !!}
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Monthly Recap Report</h3>
+    </div>    
+    <div class="box-body">
+        {!! $dataTable->table() !!}
+    </div>
+</div>
 @endsection
